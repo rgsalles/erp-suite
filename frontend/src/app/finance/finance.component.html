@@ -1,0 +1,124 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Financeiro</p>
+    <h1>Contas a pagar e receber</h1>
+  </div>
+  <div class="toolbar">
+    <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event); load()">
+      <option value="">Ativos</option>
+      <option value="Open">Em aberto</option>
+      <option value="Paid">Baixados</option>
+      <option value="Cancelled">Cancelados</option>
+    </select>
+    <button type="button" class="ghost" (click)="load()">Atualizar</button>
+  </div>
+</header>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+@if (summary(); as data) {
+  <section class="metrics">
+    <article><span>A pagar aberto</span><strong>{{ data.openPayables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>A pagar vencido</span><strong class="danger-text">{{ data.overduePayables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>A receber aberto</span><strong>{{ data.openReceivables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>A receber vencido</span><strong class="danger-text">{{ data.overdueReceivables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>Pago no mes</span><strong>{{ data.paidThisMonth | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>Recebido no mes</span><strong>{{ data.receivedThisMonth | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>Fluxo liquido</span><strong>{{ data.netCashFlowThisMonth | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+  </section>
+}
+
+<section class="split">
+  <form class="panel stack" (ngSubmit)="createEntry()">
+    <div class="panel-title">
+      <h2>Novo lancamento</h2>
+    </div>
+
+    <label>
+      Tipo
+      <select name="entryType" [(ngModel)]="entryType" (ngModelChange)="changeType($event)">
+        <option value="Payable">Conta a pagar</option>
+        <option value="Receivable">Conta a receber</option>
+      </select>
+    </label>
+
+    <label>
+      {{ entryType === 'Payable' ? 'Fornecedor' : 'Cliente' }}
+      <select name="partnerId" [(ngModel)]="partnerId">
+        @for (partner of currentPartners(); track partner.id) {
+          <option [value]="partner.id">{{ partner.name }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="grid two">
+      <label>
+        Vencimento
+        <input name="dueDate" type="date" [(ngModel)]="dueDate" />
+      </label>
+      <label>
+        Valor
+        <input name="amount" type="number" min="0" step="0.01" [(ngModel)]="amount" />
+      </label>
+    </div>
+
+    <label>
+      Descricao
+      <textarea name="description" rows="3" [(ngModel)]="description"></textarea>
+    </label>
+
+    <button class="primary" type="submit">Criar lancamento</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>Agenda financeira</h2>
+      <div class="tabs">
+        <button type="button" [class.active]="activeTab() === 'Payable'" (click)="changeTab('Payable')">A pagar</button>
+        <button type="button" [class.active]="activeTab() === 'Receivable'" (click)="changeTab('Receivable')">A receber</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Numero</th>
+            <th>Parceiro</th>
+            <th>Origem</th>
+            <th>Vencimento</th>
+            <th>Valor aberto</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of currentEntries(); track entry.id) {
+            <tr>
+              <td>{{ entry.number }}</td>
+              <td>{{ partnerName(entry) }}</td>
+              <td>{{ origin(entry) }}</td>
+              <td>{{ entry.dueDate | date:'shortDate' }}</td>
+              <td>{{ entry.openAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>
+                <span class="badge" [class.danger]="entry.isOverdue">{{ entry.isOverdue ? 'Vencido' : entry.status }}</span>
+              </td>
+              <td class="actions">
+                @if (entry.status === 'Open') {
+                  <button type="button" class="ghost" (click)="settle(entry)">
+                    {{ entry.type === 'Payable' ? 'Pagar' : 'Receber' }}
+                  </button>
+                  <button type="button" class="ghost" (click)="cancel(entry)">Cancelar</button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty">Nenhum lancamento financeiro encontrado.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

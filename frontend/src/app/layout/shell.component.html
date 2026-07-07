@@ -1,0 +1,24 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <strong>ERP Suite</strong>
+      <span>Operacoes</span>
+    </div>
+
+    <nav>
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+      }
+    </nav>
+
+    <div class="account">
+      <span>{{ auth.user()?.fullName }}</span>
+      <small>{{ auth.user()?.role }}</small>
+      <button type="button" class="ghost" (click)="auth.logout()">Sair</button>
+    </div>
+  </aside>
+
+  <section class="content">
+    <router-outlet />
+  </section>
+</div>

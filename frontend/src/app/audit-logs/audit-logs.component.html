@@ -1,0 +1,63 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Seguranca</p>
+    <h1>Auditoria do sistema</h1>
+  </div>
+  <div class="toolbar">
+    <input placeholder="Filtrar entidade. Ex: Materials" [(ngModel)]="entityName" />
+    <input type="number" min="1" max="500" [(ngModel)]="take" />
+    <button type="button" class="ghost" (click)="load()">Buscar</button>
+  </div>
+</header>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+<section class="panel">
+  <div class="panel-title">
+    <h2>Eventos registrados</h2>
+    <span>{{ logs().length }} registros</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Usuario</th>
+          <th>Acao</th>
+          <th>Metodo</th>
+          <th>Entidade</th>
+          <th>Status</th>
+          <th>Detalhes</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (log of logs(); track log.id) {
+          <tr>
+            <td>{{ log.occurredAt | date:'short' }}</td>
+            <td>
+              <strong>{{ log.userName || 'Sistema' }}</strong><br />
+              <span class="muted">{{ log.userEmail }}</span>
+            </td>
+            <td>{{ log.action }}</td>
+            <td><span class="badge">{{ log.httpMethod }}</span></td>
+            <td>{{ log.entityName }} {{ log.entityId ? '#' + log.entityId : '' }}</td>
+            <td>{{ log.statusCode }}</td>
+            <td>
+              @if (log.details) {
+                <details>
+                  <summary>Ver</summary>
+                  <pre>{{ formatDetails(log.details) }}</pre>
+                </details>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="empty">Nenhum log encontrado.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

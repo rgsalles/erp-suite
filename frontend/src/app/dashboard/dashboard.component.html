@@ -1,0 +1,57 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Visao geral</p>
+    <h1>Dashboard operacional</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <p class="muted">Carregando indicadores...</p>
+} @else if (error()) {
+  <p class="alert">{{ error() }}</p>
+} @else if (dashboard(); as data) {
+  <section class="metrics">
+    <article><span>Materiais ativos</span><strong>{{ data.activeMaterials }}</strong></article>
+    <article><span>Clientes ativos</span><strong>{{ data.activeCustomers }}</strong></article>
+    <article><span>Fornecedores</span><strong>{{ data.activeSuppliers }}</strong></article>
+    <article><span>Compras abertas</span><strong>{{ data.openPurchaseOrders }}</strong></article>
+    <article><span>Vendas abertas</span><strong>{{ data.openSalesOrders }}</strong></article>
+    <article><span>Estoque baixo</span><strong>{{ data.lowStockMaterials }}</strong></article>
+    <article><span>Valor em estoque</span><strong>{{ data.inventoryValue | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>A pagar aberto</span><strong>{{ data.openPayables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>A receber aberto</span><strong>{{ data.openReceivables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>Financeiro vencido</span><strong>{{ data.overdueFinancialEntries }}</strong></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>Itens abaixo do minimo</h2>
+      <span>{{ data.lowStockItems.length }} itens</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>Descricao</th>
+            <th>Minimo</th>
+            <th>Atual</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of data.lowStockItems; track item.materialId) {
+            <tr>
+              <td>{{ item.materialCode }}</td>
+              <td>{{ item.materialDescription }}</td>
+              <td>{{ item.minimumStock | number:'1.0-3' }} {{ item.unitCode }}</td>
+              <td><span class="badge danger">{{ item.currentStock | number:'1.0-3' }}</span></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="empty">Nenhum item abaixo do minimo.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}

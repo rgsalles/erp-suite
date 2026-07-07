@@ -1,0 +1,118 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Estoque</p>
+    <h1>Saldos e movimentacoes</h1>
+  </div>
+</header>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+<section class="split">
+  <form class="panel stack" [formGroup]="form" (ngSubmit)="saveMovement()">
+    <div class="panel-title">
+      <h2>Nova movimentacao</h2>
+    </div>
+
+    <label>
+      Material
+      <select formControlName="materialId">
+        @for (material of materials(); track material.id) {
+          <option [value]="material.id">{{ material.code }} - {{ material.description }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Almoxarifado
+      <select formControlName="warehouseId">
+        @for (warehouse of warehouses(); track warehouse.id) {
+          <option [value]="warehouse.id">{{ warehouse.code }} - {{ warehouse.name }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="grid two">
+      <label>
+        Tipo
+        <select formControlName="type">
+          @for (type of types; track type) {
+            <option [value]="type">{{ type }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Quantidade
+        <input type="number" step="0.001" min="0" formControlName="quantity" />
+      </label>
+    </div>
+
+    <label>
+      Custo unitario
+      <input type="number" step="0.01" min="0" formControlName="unitCost" />
+    </label>
+
+    <label>
+      Referencia
+      <input formControlName="reference" />
+    </label>
+
+    <label>
+      Observacoes
+      <textarea formControlName="notes" rows="3"></textarea>
+    </label>
+
+    <button class="primary" type="submit">Registrar movimentacao</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>Saldos atuais</h2>
+      <span>{{ balances().length }} materiais</span>
+    </div>
+
+    <div class="table-wrap compact">
+      <table>
+        <thead>
+          <tr><th>Codigo</th><th>Descricao</th><th>Minimo</th><th>Atual</th></tr>
+        </thead>
+        <tbody>
+          @for (balance of balances(); track balance.materialId) {
+            <tr>
+              <td>{{ balance.materialCode }}</td>
+              <td>{{ balance.materialDescription }}</td>
+              <td>{{ balance.minimumStock | number:'1.0-3' }} {{ balance.unitCode }}</td>
+              <td><span class="badge" [class.danger]="balance.belowMinimum">{{ balance.currentStock | number:'1.0-3' }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="panel">
+  <div class="panel-title">
+    <h2>Ultimas movimentacoes</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Material</th><th>Almox.</th><th>Tipo</th><th>Qtd.</th><th>Ref.</th></tr>
+      </thead>
+      <tbody>
+        @for (movement of movements(); track movement.id) {
+          <tr>
+            <td>{{ movement.movementDate | date:'short' }}</td>
+            <td>{{ movement.materialCode }} - {{ movement.materialDescription }}</td>
+            <td>{{ movement.warehouseCode }}</td>
+            <td>{{ movement.type }}</td>
+            <td><span class="badge" [class.danger]="movement.signedQuantity < 0">{{ movement.signedQuantity | number:'1.0-3' }}</span></td>
+            <td>{{ movement.reference }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

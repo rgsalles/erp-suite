@@ -1,0 +1,98 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">{{ mode() === 'purchasing' ? 'Suprimentos' : 'Comercial' }}</p>
+    <h1>{{ title() }}</h1>
+  </div>
+</header>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+<section class="split">
+  <form class="panel stack" [formGroup]="form" (ngSubmit)="create()">
+    <div class="panel-title">
+      <h2>Novo pedido</h2>
+    </div>
+
+    <label>
+      {{ partnerLabel() }}
+      <select formControlName="partnerId">
+        @for (partner of partners(); track partner.id) {
+          <option [value]="partner.id">{{ partner.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Material
+      <select formControlName="materialId">
+        @for (material of materials(); track material.id) {
+          <option [value]="material.id">{{ material.code }} - {{ material.description }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="grid two">
+      <label>
+        Quantidade
+        <input type="number" min="0" step="0.001" formControlName="quantity" />
+      </label>
+      <label>
+        {{ priceLabel() }}
+        <input type="number" min="0" step="0.01" formControlName="price" />
+      </label>
+    </div>
+
+    <label>
+      Almoxarifado para {{ mode() === 'purchasing' ? 'recebimento' : 'expedicao' }}
+      <select formControlName="warehouseId">
+        @for (warehouse of warehouses(); track warehouse.id) {
+          <option [value]="warehouse.id">{{ warehouse.code }} - {{ warehouse.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Observacoes
+      <textarea rows="3" formControlName="notes"></textarea>
+    </label>
+
+    <button class="primary" type="submit">Criar pedido</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>Pedidos recentes</h2>
+      <span>{{ orders().length }} registros</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Numero</th><th>{{ partnerLabel() }}</th><th>Status</th><th>Data</th><th>Total</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td>{{ order.number }}</td>
+              <td>{{ partnerName(order) }}</td>
+              <td><span class="badge">{{ order.status }}</span></td>
+              <td>{{ order.orderDate | date:'shortDate' }}</td>
+              <td>{{ order.total | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td class="actions">
+                @if (order.status !== 'Received' && order.status !== 'Shipped' && order.status !== 'Cancelled') {
+                  <button class="ghost" type="button" (click)="complete(order)">
+                    {{ mode() === 'purchasing' ? 'Receber' : 'Expedir' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">Nenhum pedido encontrado.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
