@@ -1,0 +1,241 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">{{ 'organization.eyebrow' | t }}</p>
+    <h1>{{ 'organization.title' | t }}</h1>
+  </div>
+</header>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+<section class="split">
+  <form class="panel stack" [formGroup]="companyForm" (ngSubmit)="saveCompany()">
+    <div class="panel-title">
+      <h2>{{ companyForm.value.id ? ('organization.editCompany' | t) : ('organization.newCompany' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetCompany()">{{ companyForm.value.id ? ('organization.newCompany' | t) : ('common.clear' | t) }}</button>
+    </div>
+
+    <div class="grid two">
+      <label>
+        {{ 'common.code' | t }}
+        <input formControlName="code" />
+      </label>
+      <label>
+        {{ 'common.name' | t }}
+        <input formControlName="name" />
+      </label>
+    </div>
+
+    <label>
+      {{ 'partners.taxId' | t }}
+      <input formControlName="taxId" />
+    </label>
+
+    <label class="check">
+      <input type="checkbox" formControlName="isActive" />
+      {{ 'common.active' | t }}
+    </label>
+
+    <button class="primary" type="submit">{{ 'organization.saveCompany' | t }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'organization.companies' | t }}</h2>
+      <span>{{ companies().length }} {{ 'common.records' | t }}</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>{{ 'common.code' | t }}</th><th>{{ 'common.name' | t }}</th><th>{{ 'partners.taxId' | t }}</th><th>{{ 'common.status' | t }}</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (company of companies(); track company.id) {
+            <tr>
+              <td>{{ company.code }}</td>
+              <td>{{ company.name }}</td>
+              <td>{{ company.taxId || '-' }}</td>
+              <td>
+                @if (company.isActive) {
+                  <span class="badge">{{ 'common.active' | t }}</span>
+                }
+              </td>
+              <td class="actions"><button type="button" class="ghost" (click)="editCompany(company)">{{ 'common.edit' | t }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">{{ 'organization.noCompanies' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="split">
+  <form class="panel stack" [formGroup]="branchForm" (ngSubmit)="saveBranch()">
+    <div class="panel-title">
+      <h2>{{ branchForm.value.id ? ('organization.editBranch' | t) : ('organization.newBranch' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetBranch()">{{ branchForm.value.id ? ('organization.newBranch' | t) : ('common.clear' | t) }}</button>
+    </div>
+
+    <label>
+      {{ 'organization.company' | t }}
+      <select formControlName="companyId">
+        @for (company of companies(); track company.id) {
+          <option [value]="company.id">{{ company.code }} - {{ company.name }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="grid two">
+      <label>
+        {{ 'common.code' | t }}
+        <input formControlName="code" />
+      </label>
+      <label>
+        {{ 'common.name' | t }}
+        <input formControlName="name" />
+      </label>
+    </div>
+
+    <label>
+      {{ 'partners.taxId' | t }}
+      <input formControlName="taxId" />
+    </label>
+
+    <label>
+      {{ 'organization.address' | t }}
+      <input formControlName="address" />
+    </label>
+
+    <label class="check">
+      <input type="checkbox" formControlName="isActive" />
+      {{ 'common.active' | t }}
+    </label>
+
+    <button class="primary" type="submit">{{ 'organization.saveBranch' | t }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'organization.branches' | t }}</h2>
+      <span>{{ branches().length }} {{ 'common.records' | t }}</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'organization.company' | t }}</th>
+            <th>{{ 'common.code' | t }}</th>
+            <th>{{ 'common.name' | t }}</th>
+            <th>{{ 'organization.address' | t }}</th>
+            <th>{{ 'common.status' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (branch of branches(); track branch.id) {
+            <tr>
+              <td>{{ branch.companyCode }}</td>
+              <td>{{ branch.code }}</td>
+              <td>{{ branch.name }}</td>
+              <td>{{ branch.address || '-' }}</td>
+              <td>
+                @if (branch.isActive) {
+                  <span class="badge">{{ 'common.active' | t }}</span>
+                }
+              </td>
+              <td class="actions"><button type="button" class="ghost" (click)="editBranch(branch)">{{ 'common.edit' | t }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">{{ 'organization.noBranches' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="split">
+  <form class="panel stack" [formGroup]="costCenterForm" (ngSubmit)="saveCostCenter()">
+    <div class="panel-title">
+      <h2>{{ costCenterForm.value.id ? ('organization.editCostCenter' | t) : ('organization.newCostCenter' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetCostCenter()">{{ costCenterForm.value.id ? ('organization.newCostCenter' | t) : ('common.clear' | t) }}</button>
+    </div>
+
+    <label>
+      {{ 'organization.company' | t }}
+      <select formControlName="companyId">
+        @for (company of companies(); track company.id) {
+          <option [value]="company.id">{{ company.code }} - {{ company.name }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="grid two">
+      <label>
+        {{ 'common.code' | t }}
+        <input formControlName="code" />
+      </label>
+      <label>
+        {{ 'common.name' | t }}
+        <input formControlName="name" />
+      </label>
+    </div>
+
+    <label>
+      {{ 'common.description' | t }}
+      <textarea formControlName="description" rows="3"></textarea>
+    </label>
+
+    <label class="check">
+      <input type="checkbox" formControlName="isActive" />
+      {{ 'common.active' | t }}
+    </label>
+
+    <button class="primary" type="submit">{{ 'organization.saveCostCenter' | t }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'organization.costCenters' | t }}</h2>
+      <span>{{ costCenters().length }} {{ 'common.records' | t }}</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'organization.company' | t }}</th>
+            <th>{{ 'common.code' | t }}</th>
+            <th>{{ 'common.name' | t }}</th>
+            <th>{{ 'common.description' | t }}</th>
+            <th>{{ 'common.status' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (costCenter of costCenters(); track costCenter.id) {
+            <tr>
+              <td>{{ costCenter.companyCode }}</td>
+              <td>{{ costCenter.code }}</td>
+              <td>{{ costCenter.name }}</td>
+              <td>{{ costCenter.description || '-' }}</td>
+              <td>
+                @if (costCenter.isActive) {
+                  <span class="badge">{{ 'common.active' | t }}</span>
+                }
+              </td>
+              <td class="actions"><button type="button" class="ghost" (click)="editCostCenter(costCenter)">{{ 'common.edit' | t }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">{{ 'organization.noCostCenters' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

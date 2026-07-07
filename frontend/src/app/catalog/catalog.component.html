@@ -1,0 +1,313 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">{{ 'catalog.eyebrow' | t }}</p>
+    <h1>{{ 'catalog.title' | t }}</h1>
+  </div>
+  <div class="toolbar">
+    <label class="inline-field">
+      {{ 'catalog.displayCurrency' | t }}
+      <select [value]="currencyService.code()" (change)="currencyService.select($any($event.target).value)">
+        @for (currency of currencies(); track currency.id) {
+          <option [value]="currency.code">{{ currency.code }} - {{ currency.symbol }}</option>
+        }
+      </select>
+    </label>
+  </div>
+</header>
+
+@if (error()) {
+  <p class="alert">{{ error() }}</p>
+}
+
+<section class="split">
+  <form class="panel stack" [formGroup]="warehouseForm" (ngSubmit)="saveWarehouse()">
+    <div class="panel-title">
+      <h2>{{ warehouseForm.value.id ? ('catalog.editWarehouse' | t) : ('catalog.newWarehouse' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetWarehouse()">{{ 'common.clear' | t }}</button>
+    </div>
+
+    <div class="grid two">
+      <label>
+        {{ 'common.code' | t }}
+        <input formControlName="code" />
+      </label>
+
+      <label>
+        {{ 'common.name' | t }}
+        <input formControlName="name" />
+      </label>
+    </div>
+
+    <label>
+      {{ 'catalog.location' | t }}
+      <input formControlName="location" />
+    </label>
+
+    <label>
+      {{ 'organization.branch' | t }}
+      <select formControlName="branchId">
+        <option value="">{{ 'catalog.noBranch' | t }}</option>
+        @for (branch of branches(); track branch.id) {
+          <option [value]="branch.id">{{ branch.code }} - {{ branch.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="check">
+      <input type="checkbox" formControlName="isActive" />
+      {{ 'common.active' | t }}
+    </label>
+
+    <button class="primary" type="submit">{{ 'catalog.saveWarehouse' | t }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'catalog.warehouses' | t }}</h2>
+      <span>{{ warehouses().length }} {{ 'common.records' | t }}</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'common.code' | t }}</th>
+            <th>{{ 'common.name' | t }}</th>
+            <th>{{ 'catalog.location' | t }}</th>
+            <th>{{ 'organization.branch' | t }}</th>
+            <th>{{ 'common.status' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (warehouse of warehouses(); track warehouse.id) {
+            <tr>
+              <td>{{ warehouse.code }}</td>
+              <td>{{ warehouse.name }}</td>
+              <td>{{ warehouse.location || '-' }}</td>
+              <td>{{ warehouse.branchName || '-' }}</td>
+              <td>
+                @if (warehouse.isActive) {
+                  <span class="badge">{{ 'common.active' | t }}</span>
+                }
+              </td>
+              <td class="actions"><button type="button" class="ghost" (click)="editWarehouse(warehouse)">{{ 'common.edit' | t }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">{{ 'catalog.noWarehouses' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="split">
+  <form class="panel stack" [formGroup]="unitForm" (ngSubmit)="saveUnit()">
+    <div class="panel-title">
+      <h2>{{ unitForm.value.id ? ('catalog.editUnit' | t) : ('catalog.newUnit' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetUnit()">{{ unitForm.value.id ? ('catalog.newUnit' | t) : ('common.clear' | t) }}</button>
+    </div>
+
+    <label>
+      {{ 'common.code' | t }}
+      <input formControlName="code" />
+    </label>
+
+    <label>
+      {{ 'common.name' | t }}
+      <input formControlName="name" />
+    </label>
+
+    <button class="primary" type="submit">{{ unitForm.value.id ? ('catalog.updateUnit' | t) : ('catalog.createUnit' | t) }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'catalog.units' | t }}</h2>
+      <div class="panel-actions">
+        <span>{{ units().length }} {{ 'common.records' | t }}</span>
+        <button type="button" class="ghost" (click)="resetUnit()">{{ 'catalog.newUnit' | t }}</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>{{ 'common.code' | t }}</th><th>{{ 'common.name' | t }}</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (unit of units(); track unit.id) {
+            <tr>
+              <td>{{ unit.code }}</td>
+              <td>{{ unit.name }}</td>
+              <td class="actions"><button type="button" class="ghost" (click)="editUnit(unit)">{{ 'common.edit' | t }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="empty">{{ 'catalog.noUnits' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="split">
+  <form class="panel stack" [formGroup]="currencyForm" (ngSubmit)="saveCurrency()">
+    <div class="panel-title">
+      <h2>{{ currencyForm.value.id ? ('catalog.editCurrency' | t) : ('catalog.newCurrency' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetCurrency()">{{ 'common.clear' | t }}</button>
+    </div>
+
+    <div class="grid two">
+      <label>
+        {{ 'catalog.currencyCode' | t }}
+        <input formControlName="code" />
+      </label>
+      <label>
+        {{ 'catalog.currencySymbol' | t }}
+        <input formControlName="symbol" />
+      </label>
+    </div>
+
+    <label>
+      {{ 'common.name' | t }}
+      <input formControlName="name" />
+    </label>
+
+    <label class="check">
+      <input type="checkbox" formControlName="isDefault" />
+      {{ 'catalog.defaultCurrency' | t }}
+    </label>
+
+    <button class="primary" type="submit">{{ 'catalog.saveCurrency' | t }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'catalog.currencies' | t }}</h2>
+      <span>{{ currencies().length }} {{ 'common.records' | t }}</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'common.code' | t }}</th>
+            <th>{{ 'common.name' | t }}</th>
+            <th>{{ 'catalog.currencySymbol' | t }}</th>
+            <th>{{ 'catalog.defaultCurrency' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (currency of currencies(); track currency.id) {
+            <tr>
+              <td>{{ currency.code }}</td>
+              <td>{{ currency.name }}</td>
+              <td>{{ currency.symbol }}</td>
+              <td>
+                @if (currency.isDefault) {
+                  <span class="badge">{{ 'catalog.default' | t }}</span>
+                }
+              </td>
+              <td class="actions">
+                <button type="button" class="ghost" (click)="selectCurrency(currency)">{{ 'catalog.useCurrency' | t }}</button>
+                <button type="button" class="ghost" (click)="editCurrency(currency)">{{ 'common.edit' | t }}</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">{{ 'catalog.noCurrencies' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="split">
+  <form class="panel stack" [formGroup]="exchangeRateForm" (ngSubmit)="saveExchangeRate()">
+    <div class="panel-title">
+      <h2>{{ exchangeRateForm.value.id ? ('catalog.editExchangeRate' | t) : ('catalog.newExchangeRate' | t) }}</h2>
+      <button type="button" class="ghost" (click)="resetExchangeRate()">{{ exchangeRateForm.value.id ? ('catalog.newExchangeRate' | t) : ('common.clear' | t) }}</button>
+    </div>
+
+    <div class="grid two">
+      <label>
+        {{ 'catalog.fromCurrency' | t }}
+        <select formControlName="fromCurrencyId">
+          @for (currency of currencies(); track currency.id) {
+            <option [value]="currency.id">{{ currency.code }} - {{ currency.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        {{ 'catalog.toCurrency' | t }}
+        <select formControlName="toCurrencyId">
+          @for (currency of currencies(); track currency.id) {
+            <option [value]="currency.id">{{ currency.code }} - {{ currency.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="grid two">
+      <label>
+        {{ 'catalog.rateDate' | t }}
+        <input type="date" formControlName="rateDate" />
+      </label>
+
+      <label>
+        {{ 'catalog.rate' | t }}
+        <input type="number" step="0.000001" min="0" formControlName="rate" />
+      </label>
+    </div>
+
+    <label>
+      {{ 'catalog.source' | t }}
+      <input formControlName="source" />
+    </label>
+
+    <button class="primary" type="submit">{{ 'catalog.saveExchangeRate' | t }}</button>
+  </form>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>{{ 'catalog.exchangeRates' | t }}</h2>
+      <div class="panel-actions">
+        <span>{{ exchangeRates().length }} {{ 'common.records' | t }}</span>
+        <button type="button" class="ghost" (click)="resetExchangeRate()">{{ 'catalog.newExchangeRate' | t }}</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'catalog.rateDate' | t }}</th>
+            <th>{{ 'catalog.fromCurrency' | t }}</th>
+            <th>{{ 'catalog.toCurrency' | t }}</th>
+            <th>{{ 'catalog.rate' | t }}</th>
+            <th>{{ 'catalog.source' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (exchangeRate of exchangeRates(); track exchangeRate.id) {
+            <tr>
+              <td>{{ exchangeRate.rateDate }}</td>
+              <td>{{ exchangeRate.fromCurrencyCode }}</td>
+              <td>{{ exchangeRate.toCurrencyCode }}</td>
+              <td>{{ exchangeRate.rate }}</td>
+              <td>{{ exchangeRate.source || '-' }}</td>
+              <td class="actions"><button type="button" class="ghost" (click)="editExchangeRate(exchangeRate)">{{ 'common.edit' | t }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">{{ 'catalog.noExchangeRates' | t }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
