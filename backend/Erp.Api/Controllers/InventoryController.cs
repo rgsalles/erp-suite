@@ -113,6 +113,7 @@ public sealed class InventoryController(ErpDbContext db, IIntegrationEventPublis
                     material.UnitOfMeasure?.Code ?? string.Empty,
                     material.MinimumStock,
                     stock,
+                    stock * material.StandardCost,
                     stock < material.MinimumStock);
             })
             .ToList();

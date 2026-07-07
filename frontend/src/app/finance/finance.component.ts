@@ -2,7 +2,9 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+import { CurrencyService } from '../core/currency.service';
 import { ErpApiService } from '../core/erp-api.service';
+import { LanguageService } from '../core/language.service';
 import {
   BusinessPartner,
   FinancialEntry,
@@ -10,14 +12,17 @@ import {
   FinancialEntryType,
   FinancialSummary
 } from '../core/models';
+import { TranslatePipe } from '../core/translate.pipe';
 
 @Component({
   selector: 'app-finance',
-  imports: [CurrencyPipe, DatePipe, FormsModule],
+  imports: [CurrencyPipe, DatePipe, FormsModule, TranslatePipe],
   templateUrl: './finance.component.html'
 })
 export class FinanceComponent implements OnInit {
   private readonly api = inject(ErpApiService);
+  private readonly language = inject(LanguageService);
+  readonly currencyService = inject(CurrencyService);
 
   readonly summary = signal<FinancialSummary | null>(null);
   readonly payables = signal<FinancialEntry[]>([]);
@@ -37,6 +42,7 @@ export class FinanceComponent implements OnInit {
   readonly currentEntries = computed(() => this.activeTab() === 'Payable' ? this.payables() : this.receivables());
 
   ngOnInit() {
+    this.currencyService.load();
     this.api.suppliers().subscribe((suppliers) => {
       this.suppliers.set(suppliers);
       this.ensurePartnerSelected();
@@ -54,7 +60,9 @@ export class FinanceComponent implements OnInit {
         this.summary.set(summary);
         this.error.set('');
       },
-      error: () => this.error.set('Nao foi possivel carregar o financeiro. Apenas Admin e Manager podem acessar.')
+      error: () => this.error.set(this.language.language() === 'en'
+        ? 'Could not load finance. Only Admin and Manager can access it.'
+        : 'Nao foi possivel carregar o financeiro. Apenas Admin e Manager podem acessar.')
     });
 
     const status = this.statusFilter() || undefined;
@@ -73,7 +81,9 @@ export class FinanceComponent implements OnInit {
 
   createEntry() {
     if (!this.partnerId || !this.dueDate || this.amount <= 0) {
-      this.error.set('Informe parceiro, vencimento e valor para criar o lancamento.');
+      this.error.set(this.language.language() === 'en'
+        ? 'Provide partner, due date, and amount to create the entry.'
+        : 'Informe parceiro, vencimento e valor para criar o lancamento.');
       return;
     }
 
@@ -91,26 +101,32 @@ export class FinanceComponent implements OnInit {
         this.activeTab.set(this.entryType);
         this.load();
       },
-      error: () => this.error.set('Nao foi possivel criar o lancamento financeiro.')
+      error: () => this.error.set(this.language.language() === 'en'
+        ? 'Could not create the financial entry.'
+        : 'Nao foi possivel criar o lancamento financeiro.')
     });
   }
 
   settle(entry: FinancialEntry) {
     this.api.settleFinancialEntry(entry.id, { paidAmount: entry.openAmount || entry.amount }).subscribe({
       next: () => this.load(),
-      error: () => this.error.set('Nao foi possivel baixar o lancamento.')
+      error: () => this.error.set(this.language.language() === 'en'
+        ? 'Could not settle the entry.'
+        : 'Nao foi possivel baixar o lancamento.')
     });
   }
 
   cancel(entry: FinancialEntry) {
     this.api.cancelFinancialEntry(entry.id).subscribe({
       next: () => this.load(),
-      error: () => this.error.set('Nao foi possivel cancelar o lancamento.')
+      error: () => this.error.set(this.language.language() === 'en'
+        ? 'Could not cancel the entry.'
+        : 'Nao foi possivel cancelar o lancamento.')
     });
   }
 
   partnerName(entry: FinancialEntry) {
-    return entry.supplierName || entry.customerName || 'Sem parceiro';
+    return entry.supplierName || entry.customerName || this.language.t('finance.noPartner');
   }
 
   currentPartners() {
@@ -118,7 +134,7 @@ export class FinanceComponent implements OnInit {
   }
 
   origin(entry: FinancialEntry) {
-    return entry.purchaseOrderNumber || entry.salesOrderNumber || 'Lancamento manual';
+    return entry.purchaseOrderNumber || entry.salesOrderNumber || this.language.t('finance.manualEntry');
   }
 
   private ensurePartnerSelected() {

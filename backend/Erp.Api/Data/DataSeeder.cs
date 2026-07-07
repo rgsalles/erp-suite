@@ -27,6 +27,43 @@ public static class DataSeeder
 
         await SeedDemoUsersAsync(db, passwordHasher, now);
 
+        if (!await db.Companies.AnyAsync(x => x.Id == SeedIds.CompanyMain))
+        {
+            db.Companies.Add(new Company
+            {
+                Id = SeedIds.CompanyMain,
+                Code = "MATRIZ",
+                Name = "ERP Suite Brasil",
+                TaxId = "00.000.000/0001-00",
+                CreatedAt = now
+            });
+        }
+
+        if (!await db.Branches.AnyAsync(x => x.Id == SeedIds.BranchHeadquarters))
+        {
+            db.Branches.Add(new Branch { Id = SeedIds.BranchHeadquarters, CompanyId = SeedIds.CompanyMain, Code = "SP", Name = "Matriz Sao Paulo", TaxId = "00.000.000/0001-00", Address = "Sao Paulo, SP", CreatedAt = now });
+        }
+
+        if (!await db.Branches.AnyAsync(x => x.Id == SeedIds.BranchDistribution))
+        {
+            db.Branches.Add(new Branch { Id = SeedIds.BranchDistribution, CompanyId = SeedIds.CompanyMain, Code = "CD", Name = "Centro de Distribuicao", TaxId = "00.000.000/0002-00", Address = "Campinas, SP", CreatedAt = now });
+        }
+
+        if (!await db.CostCenters.AnyAsync(x => x.Id == SeedIds.CostCenterAdmin))
+        {
+            db.CostCenters.Add(new CostCenter { Id = SeedIds.CostCenterAdmin, CompanyId = SeedIds.CompanyMain, Code = "ADM", Name = "Administrativo", Description = "Despesas administrativas e corporativas", CreatedAt = now });
+        }
+
+        if (!await db.CostCenters.AnyAsync(x => x.Id == SeedIds.CostCenterOperations))
+        {
+            db.CostCenters.Add(new CostCenter { Id = SeedIds.CostCenterOperations, CompanyId = SeedIds.CompanyMain, Code = "OPS", Name = "Operacoes", Description = "Compras, estoque e producao", CreatedAt = now });
+        }
+
+        if (!await db.CostCenters.AnyAsync(x => x.Id == SeedIds.CostCenterSales))
+        {
+            db.CostCenters.Add(new CostCenter { Id = SeedIds.CostCenterSales, CompanyId = SeedIds.CompanyMain, Code = "COM", Name = "Comercial", Description = "Vendas e relacionamento com clientes", CreatedAt = now });
+        }
+
         if (!await db.UnitOfMeasures.AnyAsync())
         {
             db.UnitOfMeasures.AddRange(
@@ -34,6 +71,22 @@ public static class DataSeeder
                 new UnitOfMeasure { Id = SeedIds.UnitKg, Code = "KG", Name = "Quilograma", CreatedAt = now },
                 new UnitOfMeasure { Id = SeedIds.UnitMeter, Code = "M", Name = "Metro", CreatedAt = now },
                 new UnitOfMeasure { Id = SeedIds.UnitLiter, Code = "L", Name = "Litro", CreatedAt = now });
+        }
+
+        if (!await db.CurrencyUnits.AnyAsync())
+        {
+            db.CurrencyUnits.AddRange(
+                new CurrencyUnit { Id = SeedIds.CurrencyBrl, Code = "BRL", Name = "Real brasileiro", Symbol = "R$", IsDefault = true, CreatedAt = now },
+                new CurrencyUnit { Id = SeedIds.CurrencyUsd, Code = "USD", Name = "US Dollar", Symbol = "$", CreatedAt = now },
+                new CurrencyUnit { Id = SeedIds.CurrencyEur, Code = "EUR", Name = "Euro", Symbol = "EUR", CreatedAt = now });
+        }
+
+        if (!await db.ExchangeRates.AnyAsync())
+        {
+            var today = DateOnly.FromDateTime(now.Date);
+            db.ExchangeRates.AddRange(
+                new ExchangeRate { Id = SeedIds.ExchangeBrlUsd, FromCurrencyId = SeedIds.CurrencyBrl, ToCurrencyId = SeedIds.CurrencyUsd, RateDate = today, Rate = 0.20000000m, Source = "Demo", CreatedAt = now },
+                new ExchangeRate { Id = SeedIds.ExchangeBrlEur, FromCurrencyId = SeedIds.CurrencyBrl, ToCurrencyId = SeedIds.CurrencyEur, RateDate = today, Rate = 0.18000000m, Source = "Demo", CreatedAt = now });
         }
 
         if (!await db.MaterialCategories.AnyAsync())
@@ -47,8 +100,22 @@ public static class DataSeeder
         if (!await db.Warehouses.AnyAsync())
         {
             db.Warehouses.AddRange(
-                new Warehouse { Id = SeedIds.WarehouseMain, Code = "CENTRAL", Name = "Almoxarifado Central", Location = "Matriz", CreatedAt = now },
-                new Warehouse { Id = SeedIds.WarehouseFinished, Code = "PA", Name = "Produtos Acabados", Location = "Expedicao", CreatedAt = now });
+                new Warehouse { Id = SeedIds.WarehouseMain, Code = "CENTRAL", Name = "Almoxarifado Central", Location = "Matriz", BranchId = SeedIds.BranchHeadquarters, CreatedAt = now },
+                new Warehouse { Id = SeedIds.WarehouseFinished, Code = "PA", Name = "Produtos Acabados", Location = "Expedicao", BranchId = SeedIds.BranchDistribution, CreatedAt = now });
+        }
+        else
+        {
+            var mainWarehouse = await db.Warehouses.FindAsync(SeedIds.WarehouseMain);
+            if (mainWarehouse is { BranchId: null })
+            {
+                mainWarehouse.BranchId = SeedIds.BranchHeadquarters;
+            }
+
+            var finishedWarehouse = await db.Warehouses.FindAsync(SeedIds.WarehouseFinished);
+            if (finishedWarehouse is { BranchId: null })
+            {
+                finishedWarehouse.BranchId = SeedIds.BranchDistribution;
+            }
         }
 
         if (!await db.Suppliers.AnyAsync())

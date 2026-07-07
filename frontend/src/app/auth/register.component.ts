@@ -3,17 +3,20 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../core/auth.service';
+import { Language, LanguageService } from '../core/language.service';
 import { UserRole } from '../core/models';
+import { TranslatePipe } from '../core/translate.pipe';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  readonly language = inject(LanguageService);
 
   loading = false;
   error = '';
@@ -38,9 +41,15 @@ export class RegisterComponent {
     this.auth.register(this.form.getRawValue()).subscribe({
       next: () => this.router.navigateByUrl('/dashboard'),
       error: () => {
-        this.error = 'Nao foi possivel cadastrar este usuario.';
+        this.error = this.language.language() === 'en'
+          ? 'Could not register this user.'
+          : 'Nao foi possivel cadastrar este usuario.';
         this.loading = false;
       }
     });
+  }
+
+  setLanguage(language: Language) {
+    this.language.setLanguage(language);
   }
 }

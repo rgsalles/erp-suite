@@ -1,16 +1,16 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">Financeiro</p>
-    <h1>Contas a pagar e receber</h1>
+    <p class="eyebrow">{{ 'finance.eyebrow' | t }}</p>
+    <h1>{{ 'finance.title' | t }}</h1>
   </div>
   <div class="toolbar">
     <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event); load()">
-      <option value="">Ativos</option>
-      <option value="Open">Em aberto</option>
-      <option value="Paid">Baixados</option>
-      <option value="Cancelled">Cancelados</option>
+      <option value="">{{ 'finance.active' | t }}</option>
+      <option value="Open">{{ 'finance.open' | t }}</option>
+      <option value="Paid">{{ 'finance.paid' | t }}</option>
+      <option value="Cancelled">{{ 'finance.cancelled' | t }}</option>
     </select>
-    <button type="button" class="ghost" (click)="load()">Atualizar</button>
+    <button type="button" class="ghost" (click)="load()">{{ 'finance.refresh' | t }}</button>
   </div>
 </header>
 
@@ -20,32 +20,32 @@
 
 @if (summary(); as data) {
   <section class="metrics">
-    <article><span>A pagar aberto</span><strong>{{ data.openPayables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
-    <article><span>A pagar vencido</span><strong class="danger-text">{{ data.overduePayables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
-    <article><span>A receber aberto</span><strong>{{ data.openReceivables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
-    <article><span>A receber vencido</span><strong class="danger-text">{{ data.overdueReceivables | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
-    <article><span>Pago no mes</span><strong>{{ data.paidThisMonth | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
-    <article><span>Recebido no mes</span><strong>{{ data.receivedThisMonth | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
-    <article><span>Fluxo liquido</span><strong>{{ data.netCashFlowThisMonth | currency:'BRL':'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.openPayables' | t }}</span><strong>{{ currencyService.convert(data.openPayables) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.overduePayables' | t }}</span><strong class="danger-text">{{ currencyService.convert(data.overduePayables) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.openReceivables' | t }}</span><strong>{{ currencyService.convert(data.openReceivables) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.overdueReceivables' | t }}</span><strong class="danger-text">{{ currencyService.convert(data.overdueReceivables) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.paidThisMonth' | t }}</span><strong>{{ currencyService.convert(data.paidThisMonth) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.receivedThisMonth' | t }}</span><strong>{{ currencyService.convert(data.receivedThisMonth) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
+    <article><span>{{ 'finance.netCashFlow' | t }}</span><strong>{{ currencyService.convert(data.netCashFlowThisMonth) | currency:currencyService.code():'symbol':'1.2-2' }}</strong></article>
   </section>
 }
 
 <section class="split">
   <form class="panel stack" (ngSubmit)="createEntry()">
     <div class="panel-title">
-      <h2>Novo lancamento</h2>
+      <h2>{{ 'finance.newEntry' | t }}</h2>
     </div>
 
     <label>
-      Tipo
+      {{ 'common.type' | t }}
       <select name="entryType" [(ngModel)]="entryType" (ngModelChange)="changeType($event)">
-        <option value="Payable">Conta a pagar</option>
-        <option value="Receivable">Conta a receber</option>
+        <option value="Payable">{{ 'finance.payable' | t }}</option>
+        <option value="Receivable">{{ 'finance.receivable' | t }}</option>
       </select>
     </label>
 
     <label>
-      {{ entryType === 'Payable' ? 'Fornecedor' : 'Cliente' }}
+      {{ entryType === 'Payable' ? ('common.supplier' | t) : ('common.customer' | t) }}
       <select name="partnerId" [(ngModel)]="partnerId">
         @for (partner of currentPartners(); track partner.id) {
           <option [value]="partner.id">{{ partner.name }}</option>
@@ -55,29 +55,29 @@
 
     <div class="grid two">
       <label>
-        Vencimento
+        {{ 'finance.dueDate' | t }}
         <input name="dueDate" type="date" [(ngModel)]="dueDate" />
       </label>
       <label>
-        Valor
+        {{ 'common.value' | t }}
         <input name="amount" type="number" min="0" step="0.01" [(ngModel)]="amount" />
       </label>
     </div>
 
     <label>
-      Descricao
+      {{ 'common.description' | t }}
       <textarea name="description" rows="3" [(ngModel)]="description"></textarea>
     </label>
 
-    <button class="primary" type="submit">Criar lancamento</button>
+    <button class="primary" type="submit">{{ 'finance.createEntry' | t }}</button>
   </form>
 
   <section class="panel">
     <div class="panel-title">
-      <h2>Agenda financeira</h2>
+      <h2>{{ 'finance.schedule' | t }}</h2>
       <div class="tabs">
-        <button type="button" [class.active]="activeTab() === 'Payable'" (click)="changeTab('Payable')">A pagar</button>
-        <button type="button" [class.active]="activeTab() === 'Receivable'" (click)="changeTab('Receivable')">A receber</button>
+        <button type="button" [class.active]="activeTab() === 'Payable'" (click)="changeTab('Payable')">{{ 'finance.payables' | t }}</button>
+        <button type="button" [class.active]="activeTab() === 'Receivable'" (click)="changeTab('Receivable')">{{ 'finance.receivables' | t }}</button>
       </div>
     </div>
 
@@ -85,12 +85,12 @@
       <table>
         <thead>
           <tr>
-            <th>Numero</th>
-            <th>Parceiro</th>
-            <th>Origem</th>
-            <th>Vencimento</th>
-            <th>Valor aberto</th>
-            <th>Status</th>
+            <th>{{ 'common.number' | t }}</th>
+            <th>{{ 'common.partner' | t }}</th>
+            <th>{{ 'common.origin' | t }}</th>
+            <th>{{ 'finance.dueDate' | t }}</th>
+            <th>{{ 'finance.openAmount' | t }}</th>
+            <th>{{ 'common.status' | t }}</th>
             <th></th>
           </tr>
         </thead>
@@ -101,21 +101,21 @@
               <td>{{ partnerName(entry) }}</td>
               <td>{{ origin(entry) }}</td>
               <td>{{ entry.dueDate | date:'shortDate' }}</td>
-              <td>{{ entry.openAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ currencyService.convert(entry.openAmount) | currency:currencyService.code():'symbol':'1.2-2' }}</td>
               <td>
-                <span class="badge" [class.danger]="entry.isOverdue">{{ entry.isOverdue ? 'Vencido' : entry.status }}</span>
+                <span class="badge" [class.danger]="entry.isOverdue">{{ entry.isOverdue ? ('finance.overdue' | t) : (('status.' + entry.status) | t) }}</span>
               </td>
               <td class="actions">
                 @if (entry.status === 'Open') {
                   <button type="button" class="ghost" (click)="settle(entry)">
-                    {{ entry.type === 'Payable' ? 'Pagar' : 'Receber' }}
+                    {{ entry.type === 'Payable' ? ('finance.pay' | t) : ('finance.receive' | t) }}
                   </button>
-                  <button type="button" class="ghost" (click)="cancel(entry)">Cancelar</button>
+                  <button type="button" class="ghost" (click)="cancel(entry)">{{ 'common.cancel' | t }}</button>
                 }
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="7" class="empty">Nenhum lancamento financeiro encontrado.</td></tr>
+            <tr><td colspan="7" class="empty">{{ 'finance.empty' | t }}</td></tr>
           }
         </tbody>
       </table>

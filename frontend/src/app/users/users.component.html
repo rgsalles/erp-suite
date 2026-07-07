@@ -1,7 +1,7 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">Seguranca</p>
-    <h1>Usuarios e perfis</h1>
+    <p class="eyebrow">{{ 'users.eyebrow' | t }}</p>
+    <h1>{{ 'users.title' | t }}</h1>
   </div>
 </header>
 
@@ -11,34 +11,34 @@
 
 <section class="panel">
   <div class="panel-title">
-    <h2>Usuarios cadastrados</h2>
-    <span>{{ users().length }} registros</span>
+    <h2>{{ 'users.registered' | t }}</h2>
+    <span>{{ users().length }} {{ 'common.records' | t }}</span>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead>
-        <tr><th>Nome</th><th>Email</th><th>Perfil</th><th>Ativo</th><th></th></tr>
+        <tr><th>{{ 'common.name' | t }}</th><th>{{ 'common.email' | t }}</th><th>{{ 'common.role' | t }}</th><th>{{ 'common.active' | t }}</th><th></th></tr>
       </thead>
       <tbody>
         @for (user of users(); track user.id) {
           <tr>
             <td><input [(ngModel)]="user.fullName" /></td>
-            <td>{{ user.email }}</td>
+            <td><input type="email" [(ngModel)]="user.email" /></td>
             <td>
               <select [(ngModel)]="user.role">
                 @for (role of roles; track role) {
-                  <option [value]="role">{{ role }}</option>
+                  <option [value]="role">{{ ('role.' + role) | t }}</option>
                 }
               </select>
             </td>
             <td>
-              <label class="check inline"><input type="checkbox" [(ngModel)]="user.isActive" /> Ativo</label>
+              <label class="check inline"><input type="checkbox" [(ngModel)]="user.isActive" /> {{ 'common.active' | t }}</label>
             </td>
-            <td class="actions"><button type="button" class="ghost" (click)="save(user)">Salvar</button></td>
+            <td class="actions"><button type="button" class="ghost" (click)="save(user)">{{ 'common.save' | t }}</button></td>
           </tr>
         } @empty {
-          <tr><td colspan="5" class="empty">Nenhum usuario encontrado.</td></tr>
+          <tr><td colspan="5" class="empty">{{ 'users.empty' | t }}</td></tr>
         }
       </tbody>
     </table>

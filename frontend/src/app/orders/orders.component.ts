@@ -3,21 +3,26 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
+import { CurrencyService } from '../core/currency.service';
 import { ErpApiService } from '../core/erp-api.service';
+import { LanguageService } from '../core/language.service';
 import { BusinessPartner, Material, PurchaseOrder, SalesOrder, Warehouse } from '../core/models';
+import { TranslatePipe } from '../core/translate.pipe';
 
 type OrderMode = 'purchasing' | 'sales';
 type AnyOrder = PurchaseOrder | SalesOrder;
 
 @Component({
   selector: 'app-orders',
-  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, TranslatePipe],
   templateUrl: './orders.component.html'
 })
 export class OrdersComponent implements OnInit {
   private readonly api = inject(ErpApiService);
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
+  private readonly language = inject(LanguageService);
+  readonly currencyService = inject(CurrencyService);
 
   readonly mode = signal<OrderMode>('purchasing');
   readonly orders = signal<AnyOrder[]>([]);
@@ -26,9 +31,9 @@ export class OrdersComponent implements OnInit {
   readonly warehouses = signal<Warehouse[]>([]);
   readonly error = signal('');
 
-  readonly title = computed(() => this.mode() === 'purchasing' ? 'Pedidos de compra' : 'Pedidos de venda');
-  readonly partnerLabel = computed(() => this.mode() === 'purchasing' ? 'Fornecedor' : 'Cliente');
-  readonly priceLabel = computed(() => this.mode() === 'purchasing' ? 'Custo unitario' : 'Preco unitario');
+  readonly title = computed(() => this.language.t(this.mode() === 'purchasing' ? 'orders.purchaseTitle' : 'orders.salesTitle'));
+  readonly partnerLabel = computed(() => this.language.t(this.mode() === 'purchasing' ? 'common.supplier' : 'common.customer'));
+  readonly priceLabel = computed(() => this.language.t(this.mode() === 'purchasing' ? 'orders.unitCost' : 'orders.unitPrice'));
 
   readonly form = this.fb.nonNullable.group({
     partnerId: ['', Validators.required],
@@ -40,6 +45,7 @@ export class OrdersComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.currencyService.load();
     const mode = this.route.snapshot.data['mode'] as OrderMode | undefined;
     this.mode.set(mode ?? 'purchasing');
     this.load();
@@ -98,7 +104,7 @@ export class OrdersComponent implements OnInit {
         items: [{ materialId: item.materialId, quantity: item.quantity, unitCost: item.unitCost }]
       }).subscribe({
         next: () => this.afterSave(),
-        error: () => this.error.set('Nao foi possivel criar o pedido.')
+        error: () => this.error.set(this.language.language() === 'en' ? 'Could not create the order.' : 'Nao foi possivel criar o pedido.')
       });
       return;
     }
@@ -109,7 +115,7 @@ export class OrdersComponent implements OnInit {
         items: [{ materialId: item.materialId, quantity: item.quantity, unitPrice: item.unitPrice }]
       }).subscribe({
       next: () => this.afterSave(),
-      error: () => this.error.set('Nao foi possivel criar o pedido.')
+      error: () => this.error.set(this.language.language() === 'en' ? 'Could not create the order.' : 'Nao foi possivel criar o pedido.')
     });
   }
 
@@ -118,14 +124,14 @@ export class OrdersComponent implements OnInit {
     if (this.mode() === 'purchasing') {
       this.api.receivePurchaseOrder(order.id, warehouseId).subscribe({
         next: () => this.load(),
-        error: () => this.error.set('Nao foi possivel concluir o pedido.')
+        error: () => this.error.set(this.language.language() === 'en' ? 'Could not complete the order.' : 'Nao foi possivel concluir o pedido.')
       });
       return;
     }
 
     this.api.shipSalesOrder(order.id, warehouseId).subscribe({
       next: () => this.load(),
-      error: () => this.error.set('Nao foi possivel concluir o pedido.')
+      error: () => this.error.set(this.language.language() === 'en' ? 'Could not complete the order.' : 'Nao foi possivel concluir o pedido.')
     });
   }
 

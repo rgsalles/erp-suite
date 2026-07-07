@@ -21,7 +21,7 @@ public sealed class AuthController(
     [AllowAnonymous]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
+        var email = NormalizeEmail(request.Email);
         var exists = await db.Users.AnyAsync(x => x.Email == email);
 
         if (exists)
@@ -53,7 +53,7 @@ public sealed class AuthController(
     [AllowAnonymous]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
+        var email = NormalizeEmail(request.Email);
         var user = await db.Users.FirstOrDefaultAsync(x => x.Email == email);
 
         if (user is null || !user.IsActive)
@@ -91,6 +91,11 @@ public sealed class AuthController(
     private static UserSummaryDto ToDto(AppUser user)
     {
         return new UserSummaryDto(user.Id, user.FullName, user.Email, user.Role, user.IsActive);
+    }
+
+    private static string NormalizeEmail(string email)
+    {
+        return email.Trim().ToLowerInvariant();
     }
 
     private async Task LogAuthActionAsync(string action, AppUser user, string details)

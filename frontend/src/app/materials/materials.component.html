@@ -1,11 +1,11 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">Cadastro e consulta</p>
-    <h1>Materiais</h1>
+    <p class="eyebrow">{{ 'materials.eyebrow' | t }}</p>
+    <h1>{{ 'materials.title' | t }}</h1>
   </div>
   <div class="toolbar">
-    <input placeholder="Buscar por codigo ou descricao" [value]="search()" (input)="search.set($any($event.target).value)" />
-    <button type="button" class="ghost" (click)="loadMaterials()">Buscar</button>
+    <input [placeholder]="'materials.searchPlaceholder' | t" [value]="search()" (input)="search.set($any($event.target).value)" />
+    <button type="button" class="ghost" (click)="loadMaterials()">{{ 'common.search' | t }}</button>
   </div>
 </header>
 
@@ -16,23 +16,23 @@
 <section class="split">
   <form class="panel stack" [formGroup]="form" (ngSubmit)="save()">
     <div class="panel-title">
-      <h2>{{ form.value.id ? 'Editar material' : 'Novo material' }}</h2>
-      <button type="button" class="ghost" (click)="reset()">Limpar</button>
+      <h2>{{ form.value.id ? ('materials.edit' | t) : ('materials.new' | t) }}</h2>
+      <button type="button" class="ghost" (click)="reset()">{{ 'common.clear' | t }}</button>
     </div>
 
     <label>
-      Codigo
+      {{ 'common.code' | t }}
       <input formControlName="code" />
     </label>
 
     <label>
-      Descricao
+      {{ 'common.description' | t }}
       <input formControlName="description" />
     </label>
 
     <div class="grid two">
       <label>
-        Categoria
+        {{ 'common.category' | t }}
         <select formControlName="categoryId">
           @for (category of categories(); track category.id) {
             <option [value]="category.id">{{ category.name }}</option>
@@ -41,7 +41,7 @@
       </label>
 
       <label>
-        Unidade
+        {{ 'materials.unit' | t }}
         <select formControlName="unitOfMeasureId">
           @for (unit of units(); track unit.id) {
             <option [value]="unit.id">{{ unit.code }} - {{ unit.name }}</option>
@@ -51,9 +51,9 @@
     </div>
 
     <label>
-      Fornecedor preferencial
+      {{ 'materials.preferredSupplier' | t }}
       <select formControlName="supplierId">
-        <option value="">Sem fornecedor</option>
+        <option value="">{{ 'materials.noSupplier' | t }}</option>
         @for (supplier of suppliers(); track supplier.id) {
           <option [value]="supplier.id">{{ supplier.name }}</option>
         }
@@ -62,42 +62,42 @@
 
     <div class="grid three">
       <label>
-        Custo padrao
+        {{ 'materials.standardCost' | t }}
         <input type="number" min="0" step="0.01" formControlName="standardCost" />
       </label>
       <label>
-        Preco venda
+        {{ 'materials.salePrice' | t }}
         <input type="number" min="0" step="0.01" formControlName="salePrice" />
       </label>
       <label>
-        Estoque minimo
+        {{ 'materials.minimumStock' | t }}
         <input type="number" min="0" step="0.001" formControlName="minimumStock" />
       </label>
     </div>
 
     <label class="check">
       <input type="checkbox" formControlName="isActive" />
-      Ativo
+      {{ 'common.active' | t }}
     </label>
 
-    <button class="primary" type="submit" [disabled]="saving()">{{ saving() ? 'Salvando...' : 'Salvar material' }}</button>
+    <button class="primary" type="submit" [disabled]="saving()">{{ saving() ? ('materials.saving' | t) : ('materials.save' | t) }}</button>
   </form>
 
   <section class="panel">
     <div class="panel-title">
-      <h2>Consulta</h2>
-      <span>{{ materials().length }} registros</span>
+      <h2>{{ 'materials.query' | t }}</h2>
+      <span>{{ materials().length }} {{ 'common.records' | t }}</span>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Codigo</th>
-            <th>Descricao</th>
-            <th>Categoria</th>
-            <th>Saldo</th>
-            <th>Custo</th>
+            <th>{{ 'common.code' | t }}</th>
+            <th>{{ 'common.description' | t }}</th>
+            <th>{{ 'common.category' | t }}</th>
+            <th>{{ 'materials.balance' | t }}</th>
+            <th>{{ 'materials.cost' | t }}</th>
             <th></th>
           </tr>
         </thead>
@@ -112,14 +112,14 @@
                   {{ material.currentStock | number:'1.0-3' }} {{ material.unitCode }}
                 </span>
               </td>
-              <td>{{ material.standardCost | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ currencyService.convert(material.standardCost) | currency:currencyService.code():'symbol':'1.2-2' }}</td>
               <td class="actions">
-                <button type="button" class="ghost" (click)="edit(material)">Editar</button>
-                <button type="button" class="ghost danger-text" (click)="remove(material)">Inativar</button>
+                <button type="button" class="ghost" (click)="edit(material)">{{ 'common.edit' | t }}</button>
+                <button type="button" class="ghost danger-text" (click)="remove(material)">{{ 'materials.deactivate' | t }}</button>
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="6" class="empty">Nenhum material encontrado.</td></tr>
+            <tr><td colspan="6" class="empty">{{ 'materials.empty' | t }}</td></tr>
           }
         </tbody>
       </table>

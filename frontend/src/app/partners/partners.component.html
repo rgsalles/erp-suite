@@ -1,11 +1,11 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">Cadastros</p>
-    <h1>Clientes e fornecedores</h1>
+    <p class="eyebrow">{{ 'partners.eyebrow' | t }}</p>
+    <h1>{{ 'partners.title' | t }}</h1>
   </div>
   <div class="tabs">
-    <button type="button" [class.active]="tab() === 'customers'" (click)="changeTab('customers')">Clientes</button>
-    <button type="button" [class.active]="tab() === 'suppliers'" (click)="changeTab('suppliers')">Fornecedores</button>
+    <button type="button" [class.active]="tab() === 'customers'" (click)="changeTab('customers')">{{ 'common.customers' | t }}</button>
+    <button type="button" [class.active]="tab() === 'suppliers'" (click)="changeTab('suppliers')">{{ 'common.suppliers' | t }}</button>
   </div>
 </header>
 
@@ -16,55 +16,55 @@
 <section class="split">
   <form class="panel stack" [formGroup]="form" (ngSubmit)="save()">
     <div class="panel-title">
-      <h2>{{ form.value.id ? 'Editar cadastro' : 'Novo cadastro' }}</h2>
-      <button type="button" class="ghost" (click)="reset()">Limpar</button>
+      <h2>{{ form.value.id ? ('partners.edit' | t) : ('partners.new' | t) }}</h2>
+      <button type="button" class="ghost" (click)="reset()">{{ 'common.clear' | t }}</button>
     </div>
 
     <label>
-      Nome
+      {{ 'common.name' | t }}
       <input formControlName="name" />
     </label>
 
     <div class="grid two">
       <label>
-        CPF/CNPJ
+        {{ 'partners.taxId' | t }}
         <input formControlName="taxId" />
       </label>
       <label>
-        Contato
+        {{ 'common.contact' | t }}
         <input formControlName="contactName" />
       </label>
     </div>
 
     <div class="grid two">
       <label>
-        Email
+        {{ 'common.email' | t }}
         <input type="email" formControlName="email" />
       </label>
       <label>
-        Telefone
+        {{ 'common.phone' | t }}
         <input formControlName="phone" />
       </label>
     </div>
 
     <label class="check">
       <input type="checkbox" formControlName="isActive" />
-      Ativo
+      {{ 'common.active' | t }}
     </label>
 
-    <button class="primary" type="submit">Salvar cadastro</button>
+    <button class="primary" type="submit">{{ 'partners.save' | t }}</button>
   </form>
 
   <section class="panel">
     <div class="panel-title">
-      <h2>{{ tab() === 'customers' ? 'Clientes' : 'Fornecedores' }}</h2>
-      <span>{{ currentList.length }} registros</span>
+      <h2>{{ tab() === 'customers' ? ('common.customers' | t) : ('common.suppliers' | t) }}</h2>
+      <span>{{ currentList.length }} {{ 'common.records' | t }}</span>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Nome</th><th>Documento</th><th>Email</th><th>Telefone</th><th></th></tr>
+          <tr><th>{{ 'common.name' | t }}</th><th>{{ 'common.document' | t }}</th><th>{{ 'common.email' | t }}</th><th>{{ 'common.phone' | t }}</th><th></th></tr>
         </thead>
         <tbody>
           @for (partner of currentList; track partner.id) {
@@ -73,10 +73,10 @@
               <td>{{ partner.taxId }}</td>
               <td>{{ partner.email }}</td>
               <td>{{ partner.phone }}</td>
-              <td class="actions"><button class="ghost" type="button" (click)="edit(partner)">Editar</button></td>
+              <td class="actions"><button class="ghost" type="button" (click)="edit(partner)">{{ 'common.edit' | t }}</button></td>
             </tr>
           } @empty {
-            <tr><td colspan="5" class="empty">Nenhum cadastro encontrado.</td></tr>
+            <tr><td colspan="5" class="empty">{{ 'partners.empty' | t }}</td></tr>
           }
         </tbody>
       </table>

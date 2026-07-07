@@ -6,6 +6,8 @@ public sealed class Warehouse : AuditableEntity
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string? Location { get; set; }
+    public Guid? BranchId { get; set; }
+    public Branch? Branch { get; set; }
     public bool IsActive { get; set; } = true;
     public ICollection<StockMovement> StockMovements { get; set; } = [];
 }

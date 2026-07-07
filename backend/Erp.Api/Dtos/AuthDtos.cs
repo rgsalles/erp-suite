@@ -27,5 +27,6 @@ public sealed record UserSummaryDto(
 
 public sealed record UpdateUserRequest(
     [Required, MaxLength(160)] string FullName,
+    [Required, EmailAddress, MaxLength(200)] string Email,
     UserRole Role,
     bool IsActive);

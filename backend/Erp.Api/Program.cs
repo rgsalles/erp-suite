@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using Erp.Api.Data;
+using Erp.Api.Infrastructure;
 using Erp.Api.Messaging;
 using Erp.Api.Models;
 using Erp.Api.Services;
@@ -40,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "ERP Suite API",
         Version = "v1",
-        Description = "API REST do ERP Suite com autenticacao JWT, SQL Server e modulos de materiais, estoque, compras e vendas."
+        Description = "Backend API."
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -128,6 +129,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+await DockerSqlServerInitializer.EnsureStartedAsync(app.Configuration, app.Environment);
 await DatabaseInitializer.InitializeAsync(app.Services);
 
 app.Run();

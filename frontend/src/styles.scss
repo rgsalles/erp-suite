@@ -99,7 +99,7 @@ h2 {
 
 .brand {
   display: grid;
-  gap: 4px;
+  gap: 8px;
   padding-bottom: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
@@ -111,6 +111,59 @@ h2 {
 .brand span,
 .account small {
   color: #b8c5c2;
+}
+
+.language-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  width: 112px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+}
+
+.language-toggle button {
+  min-height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: #dce8e5;
+  background: transparent;
+}
+
+.language-toggle button.active {
+  color: #17211f;
+  background: #ffffff;
+}
+
+.auth-language {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
+  background: #17211f;
+}
+
+.organization-context {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.organization-context label {
+  display: grid;
+  gap: 5px;
+  color: #b8c5c2;
+  font-size: 0.78rem;
+}
+
+.organization-context select {
+  width: 100%;
+  min-height: 36px;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f5f7f8;
+  background: #22302d;
 }
 
 nav {
@@ -220,6 +273,14 @@ nav a.active {
   margin-bottom: 14px;
 }
 
+.panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .split {
   display: grid;
   grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
@@ -252,6 +313,10 @@ label {
   color: #2f3a38;
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+.inline-field {
+  min-width: 220px;
 }
 
 input,

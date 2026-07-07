@@ -1,19 +1,23 @@
 <main class="auth-page">
+  <div class="language-toggle auth-language" [attr.aria-label]="'app.language' | t">
+    <button type="button" [class.active]="language.language() === 'pt'" (click)="setLanguage('pt')">{{ 'app.pt' | t }}</button>
+    <button type="button" [class.active]="language.language() === 'en'" (click)="setLanguage('en')">{{ 'app.en' | t }}</button>
+  </div>
   <section class="auth-panel">
     <div>
       <p class="eyebrow">ERP Suite</p>
-      <h1>Entrar no sistema</h1>
-      <p class="muted">Use o usuario inicial criado pelo seed ou cadastre o primeiro administrador.</p>
+      <h1>{{ 'auth.loginTitle' | t }}</h1>
+      <p class="muted">{{ 'auth.loginHelp' | t }}</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="stack">
       <label>
-        Email
+        {{ 'common.email' | t }}
         <input type="email" formControlName="email" autocomplete="email" />
       </label>
 
       <label>
-        Senha
+        {{ 'common.password' | t }}
         <input type="password" formControlName="password" autocomplete="current-password" />
       </label>
 
@@ -22,10 +26,10 @@
       }
 
       <button class="primary" type="submit" [disabled]="loading">
-        {{ loading ? 'Entrando...' : 'Entrar' }}
+        {{ loading ? ('auth.loggingIn' | t) : ('auth.login' | t) }}
       </button>
     </form>
 
-    <p class="muted">Ainda nao tem acesso? <a routerLink="/register">Cadastrar usuario</a></p>
+    <p class="muted">{{ 'auth.noAccess' | t }} <a routerLink="/register">{{ 'auth.registerUser' | t }}</a></p>
   </section>
 </main>

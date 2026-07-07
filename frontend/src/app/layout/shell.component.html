@@ -2,19 +2,45 @@
   <aside class="sidebar">
     <div class="brand">
       <strong>ERP Suite</strong>
-      <span>Operacoes</span>
+      <span>{{ 'app.operations' | t }}</span>
+      <div class="language-toggle" [attr.aria-label]="'app.language' | t">
+        <button type="button" [class.active]="language.language() === 'pt'" (click)="setLanguage('pt')">{{ 'app.pt' | t }}</button>
+        <button type="button" [class.active]="language.language() === 'en'" (click)="setLanguage('en')">{{ 'app.en' | t }}</button>
+      </div>
+    </div>
+
+    <div class="organization-context">
+      <label>
+        {{ 'organization.company' | t }}
+        <select [value]="organization.selectedCompany()?.id || ''" (change)="organization.selectCompany($any($event.target).value)">
+          @for (company of organization.companies(); track company.id) {
+            <option [value]="company.id">{{ company.code }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        {{ 'organization.branch' | t }}
+        <select [value]="organization.selectedBranch()?.id || ''" (change)="organization.selectBranch($any($event.target).value)">
+          @for (branch of organization.companyBranches(); track branch.id) {
+            <option [value]="branch.id">{{ branch.code }}</option>
+          }
+        </select>
+      </label>
     </div>
 
     <nav>
       @for (item of navItems; track item.path) {
-        <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+        <a [routerLink]="item.path" routerLinkActive="active">{{ item.labelKey | t }}</a>
       }
     </nav>
 
     <div class="account">
       <span>{{ auth.user()?.fullName }}</span>
-      <small>{{ auth.user()?.role }}</small>
-      <button type="button" class="ghost" (click)="auth.logout()">Sair</button>
+      @if (auth.user()?.role; as role) {
+        <small>{{ ('role.' + role) | t }}</small>
+      }
+      <button type="button" class="ghost" (click)="auth.logout()">{{ 'shell.logout' | t }}</button>
     </div>
   </aside>
 

@@ -6,8 +6,13 @@ namespace Erp.Api.Data;
 public sealed class ErpDbContext(DbContextOptions<ErpDbContext> options) : DbContext(options)
 {
     public DbSet<AppUser> Users => Set<AppUser>();
+    public DbSet<Company> Companies => Set<Company>();
+    public DbSet<Branch> Branches => Set<Branch>();
+    public DbSet<CostCenter> CostCenters => Set<CostCenter>();
     public DbSet<MaterialCategory> MaterialCategories => Set<MaterialCategory>();
     public DbSet<UnitOfMeasure> UnitOfMeasures => Set<UnitOfMeasure>();
+    public DbSet<CurrencyUnit> CurrencyUnits => Set<CurrencyUnit>();
+    public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
@@ -29,8 +34,35 @@ public sealed class ErpDbContext(DbContextOptions<ErpDbContext> options) : DbCon
             entity.HasIndex(x => x.Email).IsUnique();
             entity.Property(x => x.FullName).HasMaxLength(160).IsRequired();
             entity.Property(x => x.Email).HasMaxLength(200).IsRequired();
-            entity.Property(x => x.PasswordHash).IsRequired();
+            entity.Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
             entity.Property(x => x.Role).HasConversion<string>().HasMaxLength(40);
+        });
+
+        modelBuilder.Entity<Company>(entity =>
+        {
+            entity.HasIndex(x => x.Code).IsUnique();
+            entity.Property(x => x.Code).HasMaxLength(20).IsRequired();
+            entity.Property(x => x.Name).HasMaxLength(160).IsRequired();
+            entity.Property(x => x.TaxId).HasMaxLength(40);
+        });
+
+        modelBuilder.Entity<Branch>(entity =>
+        {
+            entity.HasIndex(x => new { x.CompanyId, x.Code }).IsUnique();
+            entity.Property(x => x.Code).HasMaxLength(20).IsRequired();
+            entity.Property(x => x.Name).HasMaxLength(160).IsRequired();
+            entity.Property(x => x.TaxId).HasMaxLength(40);
+            entity.Property(x => x.Address).HasMaxLength(240);
+            entity.HasOne(x => x.Company).WithMany(x => x.Branches).HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<CostCenter>(entity =>
+        {
+            entity.HasIndex(x => new { x.CompanyId, x.Code }).IsUnique();
+            entity.Property(x => x.Code).HasMaxLength(30).IsRequired();
+            entity.Property(x => x.Name).HasMaxLength(120).IsRequired();
+            entity.Property(x => x.Description).HasMaxLength(300);
+            entity.HasOne(x => x.Company).WithMany(x => x.CostCenters).HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<MaterialCategory>(entity =>
@@ -47,6 +79,24 @@ public sealed class ErpDbContext(DbContextOptions<ErpDbContext> options) : DbCon
             entity.Property(x => x.Name).HasMaxLength(80).IsRequired();
         });
 
+        modelBuilder.Entity<CurrencyUnit>(entity =>
+        {
+            entity.HasIndex(x => x.Code).IsUnique();
+            entity.Property(x => x.Code).HasMaxLength(3).IsRequired();
+            entity.Property(x => x.Name).HasMaxLength(80).IsRequired();
+            entity.Property(x => x.Symbol).HasMaxLength(8).IsRequired();
+        });
+
+        modelBuilder.Entity<ExchangeRate>(entity =>
+        {
+            entity.HasIndex(x => new { x.FromCurrencyId, x.ToCurrencyId, x.RateDate }).IsUnique();
+            entity.Property(x => x.RateDate).HasColumnType("date");
+            entity.Property(x => x.Rate).HasPrecision(18, 8);
+            entity.Property(x => x.Source).HasMaxLength(120);
+            entity.HasOne(x => x.FromCurrency).WithMany().HasForeignKey(x => x.FromCurrencyId).OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.ToCurrency).WithMany().HasForeignKey(x => x.ToCurrencyId).OnDelete(DeleteBehavior.NoAction);
+        });
+
         modelBuilder.Entity<Supplier>(ConfigureBusinessPartner);
         modelBuilder.Entity<Customer>(ConfigureBusinessPartner);
 
@@ -56,6 +106,7 @@ public sealed class ErpDbContext(DbContextOptions<ErpDbContext> options) : DbCon
             entity.Property(x => x.Code).HasMaxLength(20).IsRequired();
             entity.Property(x => x.Name).HasMaxLength(120).IsRequired();
             entity.Property(x => x.Location).HasMaxLength(200);
+            entity.HasOne(x => x.Branch).WithMany(x => x.Warehouses).HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Material>(entity =>
@@ -149,8 +200,8 @@ public sealed class ErpDbContext(DbContextOptions<ErpDbContext> options) : DbCon
             entity.HasOne(x => x.Customer).WithMany().HasForeignKey(x => x.CustomerId).OnDelete(DeleteBehavior.SetNull);
             entity.HasOne(x => x.PurchaseOrder).WithMany().HasForeignKey(x => x.PurchaseOrderId).OnDelete(DeleteBehavior.SetNull);
             entity.HasOne(x => x.SalesOrder).WithMany().HasForeignKey(x => x.SalesOrderId).OnDelete(DeleteBehavior.SetNull);
-            entity.HasOne(x => x.CreatedByUser).WithMany().HasForeignKey(x => x.CreatedByUserId).OnDelete(DeleteBehavior.SetNull);
-            entity.HasOne(x => x.SettledByUser).WithMany().HasForeignKey(x => x.SettledByUserId).OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(x => x.CreatedByUser).WithMany().HasForeignKey(x => x.CreatedByUserId).OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.SettledByUser).WithMany().HasForeignKey(x => x.SettledByUserId).OnDelete(DeleteBehavior.NoAction);
         });
     }
 

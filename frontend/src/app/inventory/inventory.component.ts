@@ -1,18 +1,23 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { CurrencyService } from '../core/currency.service';
 import { ErpApiService } from '../core/erp-api.service';
+import { LanguageService } from '../core/language.service';
 import { Material, StockBalance, StockMovement, StockMovementType, Warehouse } from '../core/models';
+import { TranslatePipe } from '../core/translate.pipe';
 
 @Component({
   selector: 'app-inventory',
-  imports: [ReactiveFormsModule, DecimalPipe, DatePipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, DecimalPipe, DatePipe, TranslatePipe],
   templateUrl: './inventory.component.html'
 })
 export class InventoryComponent implements OnInit {
   private readonly api = inject(ErpApiService);
   private readonly fb = inject(FormBuilder);
+  private readonly language = inject(LanguageService);
+  readonly currencyService = inject(CurrencyService);
 
   readonly balances = signal<StockBalance[]>([]);
   readonly movements = signal<StockMovement[]>([]);
@@ -32,6 +37,7 @@ export class InventoryComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.currencyService.load();
     this.load();
   }
 
@@ -70,7 +76,7 @@ export class InventoryComponent implements OnInit {
         this.form.patchValue({ quantity: 0, reference: '', notes: '' });
         this.load();
       },
-      error: () => this.error.set('Nao foi possivel registrar a movimentacao.')
+      error: () => this.error.set(this.language.language() === 'en' ? 'Could not register the movement.' : 'Nao foi possivel registrar a movimentacao.')
     });
   }
 }

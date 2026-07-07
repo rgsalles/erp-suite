@@ -1,12 +1,12 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">Seguranca</p>
-    <h1>Auditoria do sistema</h1>
+    <p class="eyebrow">{{ 'audit.eyebrow' | t }}</p>
+    <h1>{{ 'audit.title' | t }}</h1>
   </div>
   <div class="toolbar">
-    <input placeholder="Filtrar entidade. Ex: Materials" [(ngModel)]="entityName" />
+    <input [placeholder]="'audit.filterPlaceholder' | t" [(ngModel)]="entityName" />
     <input type="number" min="1" max="500" [(ngModel)]="take" />
-    <button type="button" class="ghost" (click)="load()">Buscar</button>
+    <button type="button" class="ghost" (click)="load()">{{ 'common.search' | t }}</button>
   </div>
 </header>
 
@@ -16,21 +16,21 @@
 
 <section class="panel">
   <div class="panel-title">
-    <h2>Eventos registrados</h2>
-    <span>{{ logs().length }} registros</span>
+    <h2>{{ 'audit.events' | t }}</h2>
+    <span>{{ logs().length }} {{ 'common.records' | t }}</span>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>Data</th>
-          <th>Usuario</th>
-          <th>Acao</th>
-          <th>Metodo</th>
-          <th>Entidade</th>
-          <th>Status</th>
-          <th>Detalhes</th>
+          <th>{{ 'common.date' | t }}</th>
+          <th>{{ 'common.user' | t }}</th>
+          <th>{{ 'audit.action' | t }}</th>
+          <th>{{ 'common.method' | t }}</th>
+          <th>{{ 'common.entity' | t }}</th>
+          <th>{{ 'common.status' | t }}</th>
+          <th>{{ 'common.details' | t }}</th>
         </tr>
       </thead>
       <tbody>
@@ -38,7 +38,7 @@
           <tr>
             <td>{{ log.occurredAt | date:'short' }}</td>
             <td>
-              <strong>{{ log.userName || 'Sistema' }}</strong><br />
+              <strong>{{ log.userName || ('common.system' | t) }}</strong><br />
               <span class="muted">{{ log.userEmail }}</span>
             </td>
             <td>{{ log.action }}</td>
@@ -48,14 +48,14 @@
             <td>
               @if (log.details) {
                 <details>
-                  <summary>Ver</summary>
+                  <summary>{{ 'common.view' | t }}</summary>
                   <pre>{{ formatDetails(log.details) }}</pre>
                 </details>
               }
             </td>
           </tr>
         } @empty {
-          <tr><td colspan="7" class="empty">Nenhum log encontrado.</td></tr>
+          <tr><td colspan="7" class="empty">{{ 'audit.empty' | t }}</td></tr>
         }
       </tbody>
     </table>

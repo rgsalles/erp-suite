@@ -34,7 +34,16 @@ public sealed class UsersController(ErpDbContext db) : ControllerBase
             return NotFound();
         }
 
+        var email = NormalizeEmail(request.Email);
+        var emailExists = await db.Users.AnyAsync(x => x.Id != id && x.Email == email);
+
+        if (emailExists)
+        {
+            return Conflict("This email is already registered.");
+        }
+
         user.FullName = request.FullName.Trim();
+        user.Email = email;
         user.Role = request.Role;
         user.IsActive = request.IsActive;
         user.UpdatedAt = DateTime.UtcNow;
@@ -42,5 +51,10 @@ public sealed class UsersController(ErpDbContext db) : ControllerBase
         await db.SaveChangesAsync();
 
         return Ok(new UserSummaryDto(user.Id, user.FullName, user.Email, user.Role, user.IsActive));
+    }
+
+    private static string NormalizeEmail(string email)
+    {
+        return email.Trim().ToLowerInvariant();
     }
 }

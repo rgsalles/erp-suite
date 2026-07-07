@@ -4,9 +4,14 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import {
   BusinessPartner,
+  Branch,
   CatalogItem,
+  Company,
+  CostCenter,
+  CurrencyUnit,
   AuditLog,
   Dashboard,
+  ExchangeRate,
   FinancialEntry,
   FinancialEntryStatus,
   FinancialEntryType,
@@ -37,7 +42,7 @@ export class ErpApiService {
     return this.http.get<UserSummary[]>(`${this.apiUrl}/users`);
   }
 
-  updateUser(id: string, body: { fullName: string; role: UserRole; isActive: boolean }) {
+  updateUser(id: string, body: { fullName: string; email: string; role: UserRole; isActive: boolean }) {
     return this.http.put<UserSummary>(`${this.apiUrl}/users/${id}`, body);
   }
 
@@ -45,8 +50,64 @@ export class ErpApiService {
     return this.http.get<CatalogItem[]>(`${this.apiUrl}/catalog/categories`);
   }
 
+  companies() {
+    return this.http.get<Company[]>(`${this.apiUrl}/catalog/companies`);
+  }
+
+  saveCompany(body: Partial<Company>) {
+    return body.id
+      ? this.http.put<Company>(`${this.apiUrl}/catalog/companies/${body.id}`, body)
+      : this.http.post<Company>(`${this.apiUrl}/catalog/companies`, body);
+  }
+
+  branches() {
+    return this.http.get<Branch[]>(`${this.apiUrl}/catalog/branches`);
+  }
+
+  saveBranch(body: Partial<Branch>) {
+    return body.id
+      ? this.http.put<Branch>(`${this.apiUrl}/catalog/branches/${body.id}`, body)
+      : this.http.post<Branch>(`${this.apiUrl}/catalog/branches`, body);
+  }
+
+  costCenters() {
+    return this.http.get<CostCenter[]>(`${this.apiUrl}/catalog/cost-centers`);
+  }
+
+  saveCostCenter(body: Partial<CostCenter>) {
+    return body.id
+      ? this.http.put<CostCenter>(`${this.apiUrl}/catalog/cost-centers/${body.id}`, body)
+      : this.http.post<CostCenter>(`${this.apiUrl}/catalog/cost-centers`, body);
+  }
+
   units() {
     return this.http.get<UnitOfMeasure[]>(`${this.apiUrl}/catalog/units`);
+  }
+
+  saveUnit(body: Partial<UnitOfMeasure>) {
+    return body.id
+      ? this.http.put<UnitOfMeasure>(`${this.apiUrl}/catalog/units/${body.id}`, body)
+      : this.http.post<UnitOfMeasure>(`${this.apiUrl}/catalog/units`, body);
+  }
+
+  currencies() {
+    return this.http.get<CurrencyUnit[]>(`${this.apiUrl}/catalog/currencies`);
+  }
+
+  saveCurrency(body: Partial<CurrencyUnit>) {
+    return body.id
+      ? this.http.put<CurrencyUnit>(`${this.apiUrl}/catalog/currencies/${body.id}`, body)
+      : this.http.post<CurrencyUnit>(`${this.apiUrl}/catalog/currencies`, body);
+  }
+
+  exchangeRates() {
+    return this.http.get<ExchangeRate[]>(`${this.apiUrl}/catalog/exchange-rates`);
+  }
+
+  saveExchangeRate(body: Partial<ExchangeRate>) {
+    return body.id
+      ? this.http.put<ExchangeRate>(`${this.apiUrl}/catalog/exchange-rates/${body.id}`, body)
+      : this.http.post<ExchangeRate>(`${this.apiUrl}/catalog/exchange-rates`, body);
   }
 
   suppliers() {
@@ -71,6 +132,12 @@ export class ErpApiService {
 
   warehouses() {
     return this.http.get<Warehouse[]>(`${this.apiUrl}/catalog/warehouses`);
+  }
+
+  saveWarehouse(body: Partial<Warehouse>) {
+    return body.id
+      ? this.http.put<Warehouse>(`${this.apiUrl}/catalog/warehouses/${body.id}`, body)
+      : this.http.post<Warehouse>(`${this.apiUrl}/catalog/warehouses`, body);
   }
 
   materials(search = '') {

@@ -1,6 +1,6 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">{{ mode() === 'purchasing' ? 'Suprimentos' : 'Comercial' }}</p>
+    <p class="eyebrow">{{ mode() === 'purchasing' ? ('orders.purchasingEyebrow' | t) : ('orders.salesEyebrow' | t) }}</p>
     <h1>{{ title() }}</h1>
   </div>
 </header>
@@ -12,7 +12,7 @@
 <section class="split">
   <form class="panel stack" [formGroup]="form" (ngSubmit)="create()">
     <div class="panel-title">
-      <h2>Novo pedido</h2>
+      <h2>{{ 'orders.newOrder' | t }}</h2>
     </div>
 
     <label>
@@ -25,7 +25,7 @@
     </label>
 
     <label>
-      Material
+      {{ 'common.material' | t }}
       <select formControlName="materialId">
         @for (material of materials(); track material.id) {
           <option [value]="material.id">{{ material.code }} - {{ material.description }}</option>
@@ -35,7 +35,7 @@
 
     <div class="grid two">
       <label>
-        Quantidade
+        {{ 'common.quantity' | t }}
         <input type="number" min="0" step="0.001" formControlName="quantity" />
       </label>
       <label>
@@ -45,7 +45,7 @@
     </div>
 
     <label>
-      Almoxarifado para {{ mode() === 'purchasing' ? 'recebimento' : 'expedicao' }}
+      {{ 'orders.warehouseFor' | t }} {{ mode() === 'purchasing' ? ('orders.receiving' | t) : ('orders.shipping' | t) }}
       <select formControlName="warehouseId">
         @for (warehouse of warehouses(); track warehouse.id) {
           <option [value]="warehouse.id">{{ warehouse.code }} - {{ warehouse.name }}</option>
@@ -54,42 +54,42 @@
     </label>
 
     <label>
-      Observacoes
+      {{ 'orders.notes' | t }}
       <textarea rows="3" formControlName="notes"></textarea>
     </label>
 
-    <button class="primary" type="submit">Criar pedido</button>
+    <button class="primary" type="submit">{{ 'orders.create' | t }}</button>
   </form>
 
   <section class="panel">
     <div class="panel-title">
-      <h2>Pedidos recentes</h2>
-      <span>{{ orders().length }} registros</span>
+      <h2>{{ 'orders.recent' | t }}</h2>
+      <span>{{ orders().length }} {{ 'common.records' | t }}</span>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Numero</th><th>{{ partnerLabel() }}</th><th>Status</th><th>Data</th><th>Total</th><th></th></tr>
+          <tr><th>{{ 'common.number' | t }}</th><th>{{ partnerLabel() }}</th><th>{{ 'common.status' | t }}</th><th>{{ 'common.date' | t }}</th><th>{{ 'common.total' | t }}</th><th></th></tr>
         </thead>
         <tbody>
           @for (order of orders(); track order.id) {
             <tr>
               <td>{{ order.number }}</td>
               <td>{{ partnerName(order) }}</td>
-              <td><span class="badge">{{ order.status }}</span></td>
+              <td><span class="badge">{{ ('status.' + order.status) | t }}</span></td>
               <td>{{ order.orderDate | date:'shortDate' }}</td>
-              <td>{{ order.total | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ currencyService.convert(order.total) | currency:currencyService.code():'symbol':'1.2-2' }}</td>
               <td class="actions">
                 @if (order.status !== 'Received' && order.status !== 'Shipped' && order.status !== 'Cancelled') {
                   <button class="ghost" type="button" (click)="complete(order)">
-                    {{ mode() === 'purchasing' ? 'Receber' : 'Expedir' }}
+                    {{ mode() === 'purchasing' ? ('orders.receive' | t) : ('orders.ship' | t) }}
                   </button>
                 }
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="6" class="empty">Nenhum pedido encontrado.</td></tr>
+            <tr><td colspan="6" class="empty">{{ 'orders.empty' | t }}</td></tr>
           }
         </tbody>
       </table>

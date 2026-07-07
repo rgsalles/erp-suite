@@ -10,6 +10,7 @@ public sealed record StockBalanceDto(
     string UnitCode,
     decimal MinimumStock,
     decimal CurrentStock,
+    decimal InventoryValue,
     bool BelowMinimum);
 
 public sealed record StockMovementDto(

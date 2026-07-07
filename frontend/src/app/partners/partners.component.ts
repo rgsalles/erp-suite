@@ -2,18 +2,21 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ErpApiService } from '../core/erp-api.service';
+import { LanguageService } from '../core/language.service';
 import { BusinessPartner } from '../core/models';
+import { TranslatePipe } from '../core/translate.pipe';
 
 type PartnerTab = 'customers' | 'suppliers';
 
 @Component({
   selector: 'app-partners',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslatePipe],
   templateUrl: './partners.component.html'
 })
 export class PartnersComponent implements OnInit {
   private readonly api = inject(ErpApiService);
   private readonly fb = inject(FormBuilder);
+  private readonly language = inject(LanguageService);
 
   readonly tab = signal<PartnerTab>('customers');
   readonly customers = signal<BusinessPartner[]>([]);
@@ -95,7 +98,7 @@ export class PartnersComponent implements OnInit {
         this.reset();
         this.load();
       },
-      error: () => this.error.set('Nao foi possivel salvar o cadastro.')
+      error: () => this.error.set(this.language.language() === 'en' ? 'Could not save the record.' : 'Nao foi possivel salvar o cadastro.')
     });
   }
 }

@@ -31,10 +31,60 @@ export interface CatalogItem {
   description?: string | null;
 }
 
+export interface Company {
+  id: string;
+  code: string;
+  name: string;
+  taxId?: string | null;
+  isActive: boolean;
+}
+
+export interface Branch {
+  id: string;
+  companyId: string;
+  companyCode: string;
+  companyName: string;
+  code: string;
+  name: string;
+  taxId?: string | null;
+  address?: string | null;
+  isActive: boolean;
+}
+
+export interface CostCenter {
+  id: string;
+  companyId: string;
+  companyCode: string;
+  companyName: string;
+  code: string;
+  name: string;
+  description?: string | null;
+  isActive: boolean;
+}
+
 export interface UnitOfMeasure {
   id: string;
   code: string;
   name: string;
+}
+
+export interface CurrencyUnit {
+  id: string;
+  code: string;
+  name: string;
+  symbol: string;
+  isDefault: boolean;
+}
+
+export interface ExchangeRate {
+  id: string;
+  fromCurrencyId: string;
+  fromCurrencyCode: string;
+  toCurrencyId: string;
+  toCurrencyCode: string;
+  rateDate: string;
+  rate: number;
+  source?: string | null;
 }
 
 export interface BusinessPartner {
@@ -52,6 +102,8 @@ export interface Warehouse {
   code: string;
   name: string;
   location?: string | null;
+  branchId?: string | null;
+  branchName?: string | null;
   isActive: boolean;
 }
 
@@ -79,6 +131,7 @@ export interface StockBalance {
   unitCode: string;
   minimumStock: number;
   currentStock: number;
+  inventoryValue: number;
   belowMinimum: boolean;
 }
 

@@ -44,6 +44,7 @@ public sealed class DashboardController(ErpDbContext db) : ControllerBase
                     material.UnitOfMeasure?.Code ?? string.Empty,
                     material.MinimumStock,
                     stock,
+                    stock * material.StandardCost,
                     stock < material.MinimumStock);
             })
             .ToList();

@@ -5,8 +5,10 @@ Projeto full stack de ERP com API em C#/.NET, SQL Server, JWT e frontend Angular
 ## Modulos incluidos
 
 - Login, cadastro de usuario e perfis com JWT.
+- Estrutura organizacional com empresas, filiais e centros de custo.
 - Dashboard operacional com indicadores de materiais, clientes, fornecedores, pedidos e estoque baixo.
 - Cadastro e consulta de materiais com categoria, unidade, fornecedor, custo, preco e estoque minimo.
+- Catalogo de almoxarifados, unidades de medida, moedas e cotacoes usadas na conversao de valores.
 - Estoque com saldos, movimentacoes manuais, recebimento de compras e expedicao de vendas.
 - Cadastro de clientes e fornecedores.
 - Pedidos de compra com recebimento no almoxarifado.
@@ -28,23 +30,29 @@ erp-suite/
     Models/          Entidades de dominio separadas por arquivo
     Services/        JWT, seguranca, financeiro e regras auxiliares
   frontend/          Aplicacao Angular
-  docker-compose.yml Opcao para SQL Server e RabbitMQ em container
+  backend/Erp.Api/docker-compose.yml Opcao para SQL Server e RabbitMQ em container
 ```
 
 ## Rodar localmente
 
-1. Confirme que o SQL Server local esteja rodando.
+1. Tenha o Docker em execucao.
 
-O projeto esta configurado para usar a instancia padrao instalada na maquina:
+O projeto esta configurado para usar o SQL Server definido em `backend/Erp.Api/docker-compose.yml`:
 
 ```text
-Server=localhost;Database=ErpSuiteDb;User Id=sa;Password=1234;Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true
+Server=localhost,1433;Database=ErpSuiteDb;User Id=sa;Password=Your_strong_password123;Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true
 ```
 
-Essa string usa a instancia local padrao do SQL Server com login SQL. Se o SQL Server estiver configurado para porta diferente ou instancia nomeada, ajuste o `Server`.
+Em ambiente de desenvolvimento, a API inicializa o container automaticamente antes de criar ou validar o banco:
 
-```text
-Server=localhost\SQLEXPRESS;Database=ErpSuiteDb;User Id=sa;Password=1234;Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=true
+```powershell
+dotnet run --project backend/Erp.Api/Erp.Api.csproj
+```
+
+Se quiser subir o banco manualmente, o comando continua disponivel:
+
+```powershell
+docker compose -f backend/Erp.Api/docker-compose.yml up -d sqlserver
 ```
 
 O banco `ErpSuiteDb` e criado automaticamente quando `Database:AutoCreate` esta `true`.
@@ -153,7 +161,7 @@ Para inserir esses dados em um banco que ja existe, basta iniciar a API novament
 ## Configuracoes importantes
 
 - String de conexao: `backend/Erp.Api/appsettings.json`
-- Criacao e seed do banco: secao `Database` em `backend/Erp.Api/appsettings.json`
+- Criacao, seed e inicializacao do SQL Server em Docker: secao `Database` em `backend/Erp.Api/appsettings.json`
 - JWT: secao `Jwt` em `backend/Erp.Api/appsettings.json`
 - URL da API no Angular: `frontend/src/environments/environment.ts`
 - Documento OpenAPI: `http://localhost:5242/openapi/v1.json`
@@ -162,6 +170,8 @@ Para inserir esses dados em um banco que ja existe, basta iniciar a API novament
 - Auditoria: `http://localhost:5242/api/audit-logs`
 - Financeiro: `http://localhost:5242/api/finance/summary`
 - RabbitMQ: secao `RabbitMq` em `backend/Erp.Api/appsettings.json`
+- Estrutura organizacional: menu **Organizacao** no Angular e endpoints `api/catalog/companies`, `api/catalog/branches` e `api/catalog/cost-centers`
+- Almoxarifados, unidades, moedas e cotacoes: menu **Catalogo** no Angular e endpoints `api/catalog/warehouses`, `api/catalog/units`, `api/catalog/currencies` e `api/catalog/exchange-rates`
 
 ## Auditoria
 
@@ -226,6 +236,6 @@ Arquivos principais:
 - `backend/Erp.Api/Messaging/IntegrationEvents.cs`
 - `backend/Erp.Api/Messaging/RabbitMqRoutingKeys.cs`
 
-O arquivo `docker-compose.yml` ficou como opcao caso voce queira subir RabbitMQ ou SQL Server em container. Para usar seu SQL Server local instalado, nao precisa subir o servico `sqlserver`.
+O arquivo `backend/Erp.Api/docker-compose.yml` e o caminho local padrao para subir SQL Server e RabbitMQ. Em desenvolvimento, `Database:DockerSqlServer:Enabled` inicia automaticamente o servico `sqlserver` antes da criacao do banco. Para usar um SQL Server instalado fora do Docker, desabilite essa opcao e ajuste `ConnectionStrings:DefaultConnection` nos arquivos `appsettings`.
 
 Antes de usar em producao, troque a chave JWT e mova segredos para variaveis de ambiente ou um cofre de segredos.
